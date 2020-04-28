@@ -18,7 +18,7 @@ public class DivideEtImp14T2 {
         int m = tmp.intValue();
 
 
-        int[][] mtrx = new int[m][n];
+        int[][] mtrx = new int[m][m];
         for (int i = 0; i < mtrx.length; i++) {
             for (int j = 0; j < mtrx[0].length; j++)
                 mtrx[i][j] = 0;
