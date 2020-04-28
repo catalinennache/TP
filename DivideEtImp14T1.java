@@ -1,121 +1,164 @@
-import java.io.*;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class DivideEtImp14T1 {
 
 
-
     public static void main(String[] args) throws IOException {
 
-       punct.init("data.in","data.out");
-       punct start = punct.getStartingPoint();
-       Hashura(start);
-       System.out.println("-------");
-       punct.flushMatrix();
-       punct.printMatrix();
+        (new DivideEtImp14T1()).Rezolva();
 
     }
 
-    public static void Hashura(punct current_pos){
 
-        if(current_pos.isOutOfBounds() || current_pos.getMatrixVal() == 1  )
-                return;
+    public void Rezolva() {
+        File input;
+        File output;
 
-        current_pos.hashuieste();
-        Hashura(current_pos.getVecin(VECIN.STANGA));
-        Hashura(current_pos.getVecin(VECIN.IN_FATA));
-        Hashura(current_pos.getVecin(VECIN.DREAPTA));
-        Hashura(current_pos.getVecin(VECIN.IN_SPATE));
+        input = new File("data.in");
+
+        int[][] matrix = null;
+        Punct start_point = null;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(input));
+            String[] M_N = reader.readLine().split(" ");
+            int M = Integer.parseInt(M_N[0]);
+            int N = Integer.parseInt(M_N[1]);
+
+            matrix = new int[M][N];
+
+            for (int i = 0; i < Integer.parseInt(M_N[0]); i++) {
+                String[] line_cells = reader.readLine().split(" ");
+                for (int j = 0; j < line_cells.length; j++)
+                    matrix[i][j] = Integer.parseInt(line_cells[j]);
+            }
+
+            String[] coords = reader.readLine().split(" ");
+             start_point = new Punct(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]));
+            reader.close();
+        }catch (IOException e){
+            System.out.println("Problema la citire si initializare");
+            e.printStackTrace();
+            System.exit(0);
+        } catch (Exception e){
+            System.out.println("Problema la initializare");
+            e.printStackTrace();
+            System.exit(0);
+        }
+
+        Hasureaza(start_point, matrix);
+
+        try {
+            output = new File("data.out");
+            writeMatrix(matrix, output);
+        }catch (IOException e){
+            System.out.println("Problema la scriere");
+            e.printStackTrace();
+            System.exit(0);
+        }
+        printMatrix(matrix);
+
+
+    }
+
+    public void Hasureaza(Punct current_pos, int[][] matrix) {
+        if (isOutOfBounds(current_pos, matrix) || matrix[current_pos.getY()][current_pos.getX()] == 1) {
+
+            return;
+        }
+
+        matrix[current_pos.getY()][current_pos.getX()] = 1;
+        Hasureaza(current_pos.getVecin(VECIN.STANGA), matrix);
+        Hasureaza(current_pos.getVecin(VECIN.IN_FATA), matrix);
+        Hasureaza(current_pos.getVecin(VECIN.DREAPTA), matrix);
+        Hasureaza(current_pos.getVecin(VECIN.IN_SPATE), matrix);
     }
 
 
-
-}
- enum VECIN {
-    STANGA,
-    DREAPTA,
-    IN_FATA,
-    IN_SPATE
-}
-class punct{
-
-
-    public static Integer[][] matrix =  null;
-    private static File input;
-    private static File output;
-    private static punct start_point;
-    private int x,y;
-
-    punct(int x,int y){
-        this.x = x;
-        this.y = y;
-    }
-   public static  punct getStartingPoint(){
-        return punct.start_point;
-    }
-   void hashuieste(){
-        matrix[x][y]=1;
-   }
-
-   int getMatrixVal(){
-        return matrix[x][y];
-    }
-
-    boolean isOutOfBounds(){
-        try{
-            int a = matrix[x][y];
-        return false;
-        }catch (Exception e){ return  true;}
-    }
-
-    punct getVecin(VECIN v){
-
-        int next_x = v.equals(VECIN.IN_SPATE)?x-1:v.equals(VECIN.IN_FATA)?x+1:x;
-        int next_y = v.equals(VECIN.STANGA)?y-1:v.equals(VECIN.DREAPTA)?y+1:y;
-
-        return new punct(next_x,next_y);
-    }
-
-    public static void printMatrix(){
-        for(int i = 0; i<punct.matrix.length;i++){
-            for(int j =0; j<punct.matrix[0].length;j++){
-                System.out.print(punct.matrix[i][j]+" ");
+    public void printMatrix(int[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                System.out.print(matrix[i][j] + " ");
             }
             System.out.println();
         }
     }
 
-    public static void init(String input_file,String output_file) throws IOException {
-        input = new File(input_file);
-        output = new File(output_file);
 
-        BufferedReader reader = new BufferedReader(new FileReader(input));
-        String[] M_N = reader.readLine().split(" ");
-        matrix = new Integer[Integer.parseInt(M_N[0])][Integer.parseInt(M_N[1])];
-
-        for(int i = 0; i<Integer.parseInt(M_N[0]); i++){
-            String[] line_cells = reader.readLine().split(" ");
-            for(int j = 0; j < line_cells.length; j++)
-                matrix[i][j] = Integer.valueOf(line_cells[j]);
-        }
-
-        String[] coords =  reader.readLine().split(" ");
-        start_point = new punct(Integer.parseInt(coords[0]),Integer.parseInt(coords[1]));
-        reader.close();
-    }
-
-
-
-    public static void flushMatrix() throws IOException {
+    public void writeMatrix(int[][] matrix, File output) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(output));
 
-        for(int i = 0; i<matrix.length; i++){
-            for (int j = 0; j<matrix[0].length; j++)
-                writer.write(matrix[i][j]+  (j == matrix[0].length-1?"":" "));
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++)
+                writer.write(matrix[i][j] + (j == matrix[0].length - 1 ? "" : " "));
             writer.newLine();
         }
 
         writer.flush();
         writer.close();
     }
+
+    boolean isOutOfBounds(Punct punct, int[][] matrix) {
+        int x = punct.getX();
+        int y = punct.getY();
+        return x >= matrix[0].length || x < 0 || y >= matrix.length || y < 0;
+    }
+
+
+}
+
+enum VECIN {
+    STANGA,
+    DREAPTA,
+    IN_FATA,
+    IN_SPATE
+}
+
+class Punct {
+
+    private int x, y;
+
+    Punct(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    int getX() {
+        return x;
+    }
+
+    int getY() {
+        return y;
+    }
+
+
+    Punct getVecin(VECIN v) {
+        int next_x = 0;
+        int next_y = 0;
+
+        if (v.equals(VECIN.IN_SPATE)) {
+            next_x = x - 1;
+        }
+        else if (v.equals(VECIN.IN_FATA)) {
+            next_x = x + 1;
+        }else {
+            next_x = x;
+        }
+
+        if (v.equals(VECIN.STANGA)) {
+            next_y = y - 1;
+        }else if (v.equals(VECIN.DREAPTA)) {
+            next_y = y + 1;
+        }else{
+            next_y = y;
+        }
+
+        return new Punct(next_x, next_y);
+    }
+
 
 }
