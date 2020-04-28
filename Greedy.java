@@ -81,22 +81,22 @@ public class Greedy {
         songs = sortSongsByDuration(songs);
         ArrayList<Song> sung_songs = new ArrayList<>();
         Song chopped_song = null;
-        double chopped_ration = 0;
+        double chopped_ratio = 0;
         for (Song song : songs) {
             int duration = song.getDurationInSeconds();
             if (S - duration > 0) {
                 S = S - duration;
                 sung_songs.add(song);
             } else if (S > 0) {
-                chopped_ration = 1.0 * S / duration;
+                chopped_ratio = 1.0 * S / duration;
                 chopped_song = song;
                 S = 0;
                 break;
             }
         }
         String extra = "";
-        if (chopped_ration > 0) {
-            extra = " and " + String.format("%.2f", chopped_ration * 100) + "% out of the " + chopped_song.getName();
+        if (chopped_ratio > 0) {
+            extra = " and " + String.format("%.2f", chopped_ratio * 100) + "% out of the " + chopped_song.getName();
         }
         System.out.println("Gigel sang " + sung_songs.size() + " songs" + extra);
 
