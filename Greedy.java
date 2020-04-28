@@ -10,6 +10,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+/*
+Enunt
+
+2. Sandel este cantaret. El cunoaste n melodii, despre acestea stim
+numarul de minute si secunde. Toate aceste informatii sunt
+generate aleator in fisierul date.in. Sandel poate canta in cadrul
+
+unui festival timp de s secunde. Realizati un algoritm care sa il
+ajute pe Sandel sa cante cat mai multe melodii.
+
+https://drive.google.com/file/d/19JBLM6UnFgDURpg17tMb7gmCs-Iak8xG/view?usp=sharing
+*/
+
 public class Greedy {
 
     public static void main(String[] args) {
