@@ -105,7 +105,7 @@ class WordsGeneratorProblem {
 
         for (int i = 0; i < symbols.length; i++) {
 
-            //conditia de validitate pe care intentionam sa-l adaugam la secventa pe care o construim
+            //conditia de validitate pentru elementul pe care intentionam sa-l adaugam la secventa pe care o construim
             // sa nu fie la fel ca ultimul element, sa nu se formeze combinatia de x & y si invers
             if (!symbols[i].equals(last_element)
                     && !(symbols[i].equals("x") && last_element.equals("y"))
