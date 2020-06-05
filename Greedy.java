@@ -32,11 +32,11 @@ public class Greedy {
 
 
     public void problema3CuGigel() {
-
+        //De aici
         File f = new File("date.in");
         int N = 0;
         int S = 0;
-        Song[] songs = null;
+        ArrayList<Song> songs = null;
         try {
             genereazaDateProblema(f);
 
@@ -54,7 +54,7 @@ public class Greedy {
 
             line = br.readLine();
             N = Integer.parseInt(line.trim());
-            songs = new Song[N];
+            songs = new ArrayList<>(N);
 
             int minutes = 0;
             int seconds = 0;
@@ -66,7 +66,7 @@ public class Greedy {
                 minutes = Integer.parseInt(tmp[0]);
                 seconds = Integer.parseInt(tmp[1]);
                 name = "Song" + String.valueOf(i + 1);
-                songs[i] = new Song(name, minutes, seconds);
+                songs.add(new Song(name, minutes, seconds));
             }
 
             fr.close();
@@ -77,8 +77,15 @@ public class Greedy {
             System.out.println("Problema la citirea si centralizarea datelor:" + e.getLocalizedMessage());
             System.exit(0);
         }
+        //Si pana aici avem O(N)
 
-        songs = sortSongsByDuration(songs);
+        //De aici
+        songs.sort((song1,song2)->{
+            return song1.getDurationInSeconds() - song2.getDurationInSeconds();
+        });
+        //Si pana aici avem O(N*Log(N))
+
+        //De aici
         ArrayList<Song> sung_songs = new ArrayList<>();
         Song chopped_song = null;
         double chopped_ratio = 0;
@@ -99,15 +106,18 @@ public class Greedy {
             extra = " and " + String.format("%.2f", chopped_ratio * 100) + "% out of the " + chopped_song.getName();
         }
         System.out.println("Gigel sang " + sung_songs.size() + " songs" + extra);
+        //Pana aici avem O(N)
 
+        //De aici 
         sung_songs.forEach(song -> {
             System.out.println("Gigel sang " + song.getName() + " (" + song.getDurationInSeconds() + " seconds)");
         });
+        //Pana aici avem O(N)
 
-
+        //O(N)+O(N*Log(N))+O(N)+O(N) = O(N*Log(N))
     }
 
-    private Song[] sortSongsByDuration(Song[] songs) {
+  /*  private Song[] sortSongsByDuration(Song[] songs) {
         HashMap<Integer, ArrayList<Song>> map = new HashMap<>();
         int[] durations = new int[songs.length];
 
@@ -133,7 +143,7 @@ public class Greedy {
         }
 
         return sorted_songs;
-    }
+    }*/
 
     private void genereazaDateProblema(File f) throws IOException {
         if (f.exists())
@@ -152,7 +162,8 @@ public class Greedy {
         for (int i = 0; i < N; i++) {
             int minute = randomTool.nextInt(7) + 1;
             int secunde = randomTool.nextInt(60);
-            String line = String.valueOf(minute) + ":" + String.valueOf(secunde);
+            String secunde_formatate = (secunde<10?"0":"") + String.valueOf(secunde);
+            String line = String.valueOf(minute) + ":" + secunde_formatate;
             bw.write(line);
             bw.newLine();
         }

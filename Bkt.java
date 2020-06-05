@@ -99,11 +99,11 @@ public class Bkt {
     }
 
     public void compute(int[][] elements, String built_sequence, int last_element, ArrayList<String> solutions_set) {
-        if (built_sequence == null || built_sequence.length() == 0) {
+        if (!valid_sequence(built_sequence)) {
             System.out.println("built_sequence nu poate fi gol sau null");
             return;
         }
-        if (built_sequence.length() == elements.length) {
+        if (valid_solution(built_sequence,elements)) {
             solutions_set.add(built_sequence);
             return;
         }
@@ -116,6 +116,14 @@ public class Bkt {
         }
 
 
+    }
+
+    public boolean valid_solution(String built_sequence,int[][] elements){
+        return built_sequence.length() == elements.length;
+    }
+
+    public boolean valid_sequence(String built_sequence){
+       return built_sequence != null && built_sequence.length() > 0;
     }
 
 

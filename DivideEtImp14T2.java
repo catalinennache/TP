@@ -17,19 +17,27 @@ public class DivideEtImp14T2 {
         Double tmp = Math.pow(2, n); //Am facut boxing pentru ca mi s-a parut cea mai safe conversie
         int m = tmp.intValue();
 
-
+        //De aici 
         int[][] mtrx = new int[m][m];
         for (int i = 0; i < mtrx.length; i++) {
             for (int j = 0; j < mtrx[0].length; j++)
                 mtrx[i][j] = 0;
         }
-        fillMatrix(mtrx, 4, 0, 0);
+        //Pana aici este O(n^2)
+        //De aici 
+        fillMatrix(mtrx, m, 0, 0);
+        //pana aici este O((n^2) * log2(n))
 
+
+        //De aici 
         for (int i = 0; i < mtrx.length; i++) {
             for (int j = 0; j < mtrx[0].length; j++)
                 System.out.print(mtrx[i][j]);
             System.out.println();
         }
+        //Pana aici este O(n^2)
+
+        //Complexitatea pe intreaga problema este O((n^2) * log2(n))
 
     }
 
@@ -40,7 +48,7 @@ public class DivideEtImp14T2 {
             matrix[x_start][y_start] = 1;
             return;
         }
-
+        // din cauza ca aceste doua foruri depind de "bound" complexitatea este initial (n/2)^2 
         for (int i = 0; i < bound / 2; i++) {
             for (int j = 0; j < bound / 2; j++)
                 matrix[i + x_start][j + y_start] = 1;
