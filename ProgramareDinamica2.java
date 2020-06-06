@@ -99,8 +99,9 @@ class GarfieldProblem {
     private int N;
     private int T;
     private int[] cookies_per_house; //util in a stii cate case sunt si ce prajituri ofera fiecare
-
+    private int[] computed_remaining_cookies;
     private int cookies_in_the_bag;
+    private int[][] case_si_treceri;
     private ArrayList<Integer> visited_houses;
 
     public GarfieldProblem(){
@@ -114,16 +115,26 @@ class GarfieldProblem {
     public void rezolva() {
 
 
-        int[] computedCookies = computeRemainingCookies(this.cookies_per_house);
+       // Integer[] computedCookies = new Integer[this.cookies_per_house.length];//computeRemainingCookies(this.cookies_per_house);
+        computed_remaining_cookies = computeRemainingCookies(cookies_per_house);
+        case_si_treceri = new int[T+1][cookies_per_house.length];
+        for(int i = 0;i< case_si_treceri.length;i++)
+            for(int j =1; j<case_si_treceri[0].length;j++)
+                case_si_treceri[i][j] = 0;
 
+
+    /*    for(int i = 1; i<computedCookies.length;i++){
+            computedCookies[i]= -1;
+        }
+        computeCookies(computedCookies,1);*/
 
         System.out.println("\n**************");
 
 
         int start_house;
-        if(computedCookies[1] > computedCookies[2]){
-            start_house = 1;
-        }else if( computedCookies[1] == computedCookies[2] && cookies_per_house[1] > cookies_per_house[2]){
+
+
+        if(f(1,T) > f(2,T)){
             start_house = 1;
         }else{
             start_house = 2;
@@ -134,17 +145,28 @@ class GarfieldProblem {
 
         for(int i = start_house; i<cookies_per_house.length;i=i+2){
             cookies_in_the_bag += cookies_per_house[i];
-
             visited_houses.add(i);
-            //daca mai sunt case SI daca merita sa treaca strada
-            if(i+1 < cookies_per_house.length && T>0 && i+2 < cookies_per_house.length  && computedCookies[i+2]<computedCookies[i+1]){
+            int res1 = f(i+2,T);
+            int res2 = f(i+1,T-1);
+            System.out.println("Comparing f("+(i+2)+","+T+") = "+res1+" and  f("+(i+1)+","+(T-1)+") = "+res2);
+            boolean trec_strada = res1 <res2;
+            //daca merita sa treaca strada
+            if(trec_strada){
                 i--; //decrementarea indexului cu o unitate inseamna schimbarea de la par la impar si invers (adica trecerea strazii)
                 T--; //contorizam de cate ori a trecut strada
-            }else if(i+1 < cookies_per_house.length && T>0 && i+2 == cookies_per_house.length  && computedCookies[i+1] > 0){
-                i--;
-                T--;
             }
         }
+
+        System.out.println("Domeniile si codomeniul functiei f");
+
+        for(int i = 0;i< case_si_treceri.length;i++) {
+            for (int j = 1; j < case_si_treceri[0].length; j++)
+                System.out.print(" [f("+j+","+i+") = " + case_si_treceri[i][j]+"] ");
+            System.out.println();
+        }
+
+        System.out.println();
+
 
         System.out.println("Prajituri primite: "+cookies_in_the_bag);
         System.out.print("Case vizitate: ");
@@ -168,7 +190,39 @@ class GarfieldProblem {
         return  remCookies;
     }
 
+    public void computeRemainingCookiesV2(int[] houses,Integer[] result,int house){
 
+
+    }
+
+    public int f(int x,int T) {
+       // System.out.print("computing f("+(x)+","+T+") = ");
+        if(x < case_si_treceri[0].length && case_si_treceri.length > T && T>=0) {
+            if (case_si_treceri[T][x] == 0) {
+                if (T == 0) {
+                    // prima ramura a functiei f din poza atasata
+                    case_si_treceri[T][x] = computed_remaining_cookies[x];
+                //    System.out.println("comp_r_c >> "+case_si_treceri[T][x]+"<<");
+                    return computed_remaining_cookies[x];
+                } else {
+                    // ramura 2 a functiei f din poza atasata
+                    case_si_treceri[T][x] = cookies_per_house[x] + max(f(x + 1, T - 1), f(x + 2, T));
+                 //   System.out.println("<<"+case_si_treceri[T][x]+"="+(case_si_treceri[T][x]-cookies_per_house[x])+"+"+cookies_per_house[x]);
+                    return case_si_treceri[T][x];
+                }
+            } else {
+               // System.out.println(case_si_treceri[T][x]);
+                return case_si_treceri[T][x];
+            }
+        }
+      //  System.out.print("overflow");
+        return 0;
+
+
+    }
+    public int max(int a, int b){
+        return a>b?a:b;
+    }
     public void genereazaDatele() throws IOException {
         System.out.print("Datele de intrare sunt generate in fisierul data.in...");
         File f = new File("data.in");
@@ -270,77 +324,86 @@ Logica programului:
 Am considerat ca cea mai buna metoda de abordare a problemei este sa precalculez pentru fiecare casa
 cat va mai avea de castigat Garfield daca ramane pe aceeasi parte de la acea casa pana la final.
 
-In caz ca la un anumit punct partea cealalta devine mai profitabila (factorul de "profitabilitate" reprezinta 
-cantitatea de biscuiti obtinuta de la acea casa pana la sfarsit mergand numai pe acea parte a strazii) acesta
-va trece strada daca este posibil (T>0).
+De asemenea fiecare casa vizitata, Garfield va apela functia f cu optiunile pe care le are.
+Sa continue pastrandu-si numarul de traversari sau sa treaca si sa piarda o traversare.
 
+Functia f intoarce numarul de prajituri care pot fi obtinute pentru casa x, tinand cont de numarul de treceri ramase.
+Am retinut intr-o matrice, ale carei coloane reprezinta casele si ale carei linii reprezinta traversarile ramase dupa ce garfield a ajung in fata casei x,
+pentru a curata arborele de executie de apelurile redundante.
+
+Link cu pozele facute la ce am schitat pe foaie, pentru usurarea evaluarii:
+
+https://drive.google.com/folderview?id=1gRyOI0MyinFgNjH3yylxphKC2Iu1gcHW
 
 Executarea programului:
 
 *Primul argument pentru executare se refera la generarea automata a datelor de input (1 sau absenta oricarui parametru inseamna ca generarea de date va fi activata)
 *Al doilea argument se refera la modul de citire al datelor (1 inseamna citire de la tastatura si 0 din fisierul data.in)
 
-Demo1 (input + output) comanda de executare: "java ProgramareDinamica2.java 0"
+
 ------------------------------------------------------------------------------
-    Citirea se face din fisierul data.in...success!!
-
-    N si T: 4 1
-    Prajituri per casa: 1 0 6 3 
-    ************** 
-
-                                    House 4 with 3 cookies, I will gain 3 if I stay on this side from now 'till the end
-    House 3 with 6 cookies, I will gain 6 if I stay on this side from now 'till the end
-                                    House 2 with 0 cookies, I will gain 3 if I stay on this side from now 'till the end
-    House 1 with 1 cookies, I will gain 7 if I stay on this side from now 'till the end
-
-    **************
-    Prajituri primite: 10
-    Case vizitate: 1 3 4 
-
-    Scriere date in fisierul data.out...success!!
+Demo1 java ProgramareDinamica2.java 0 1
 ------------------------------------------------------------------------------
-Demo2 (Datele oferite ca exemplu in enuntul problemei) "java ProgramareDinamica2.java 0 1"
+Dati N si T separate printr-un spatiu
+6 4
+Dati prajiturile pentru fiecare casa
+1 1 1 1 1 1
+
+**************
+
+                                   House 6 with 1 cookies, I will gain 1 if I stay on this side from now 'till the end
+House 5 with 1 cookies, I will gain 1 if I stay on this side from now 'till the end
+                                   House 4 with 1 cookies, I will gain 2 if I stay on this side from now 'till the end
+House 3 with 1 cookies, I will gain 2 if I stay on this side from now 'till the end
+                                   House 2 with 1 cookies, I will gain 3 if I stay on this side from now 'till the end
+House 1 with 1 cookies, I will gain 3 if I stay on this side from now 'till the end
+
+**************
+Comparing f(4,4) = 3 and  f(3,3) = 4
+Comparing f(5,3) = 2 and  f(4,2) = 3
+Comparing f(6,2) = 1 and  f(5,1) = 2
+Comparing f(7,1) = 0 and  f(6,0) = 1
+Comparing f(8,0) = 0 and  f(7,-1) = 0
+Domeniile si codomeniul functiei f
+ [f(1,0) = 0]  [f(2,0) = 0]  [f(3,0) = 0]  [f(4,0) = 0]  [f(5,0) = 1]  [f(6,0) = 1]
+ [f(1,1) = 0]  [f(2,1) = 0]  [f(3,1) = 0]  [f(4,1) = 2]  [f(5,1) = 2]  [f(6,1) = 1]
+ [f(1,2) = 0]  [f(2,2) = 0]  [f(3,2) = 3]  [f(4,2) = 3]  [f(5,2) = 2]  [f(6,2) = 1]
+ [f(1,3) = 0]  [f(2,3) = 4]  [f(3,3) = 4]  [f(4,3) = 3]  [f(5,3) = 2]  [f(6,3) = 1]
+ [f(1,4) = 5]  [f(2,4) = 5]  [f(3,4) = 4]  [f(4,4) = 3]  [f(5,4) = 2]  [f(6,4) = 1]
+
+Prajituri primite: 5
+Case vizitate: 2 3 4 5 6
 ------------------------------------------------------------------------------
-    Dati N si T separate printr-un spatiu
-    6 2
-    Dati prajiturile pentru fiecare casa
-    7 5 3 8 9 6
-
-    ************** 
-
-                                    House 6 with 6 cookies, I will gain 6 if I stay on this side from now 'till the end
-    House 5 with 9 cookies, I will gain 9 if I stay on this side from now 'till the end
-                                    House 4 with 8 cookies, I will gain 14 if I stay on this side from now 'till the end
-    House 3 with 3 cookies, I will gain 12 if I stay on this side from now 'till the end
-                                    House 2 with 5 cookies, I will gain 19 if I stay on this side from now 'till the end
-    House 1 with 7 cookies, I will gain 19 if I stay on this side from now 'till the end
-
-    **************
-    Prajituri primite: 29
-    Case vizitate: 1 2 4 5 
 ------------------------------------------------------------------------------
-Demo3 "java ProgramareDinamica2.java"
+Demo2 java ProgramareDinamica2.java 0 1
 ------------------------------------------------------------------------------
-    Datele de intrare sunt generate in fisierul data.in...success!!
-    Citirea se face din fisierul data.in...success!!
+Dati N si T separate printr-un spatiu
+8 2
+Dati prajiturile pentru fiecare casa
+2 4 8 2 0 1 2 6
 
-    N si T: 8 1
-    Prajituri per casa: 6 6 7 2 4 2 1 6 
-    ************** 
+**************
 
-                                    House 8 with 6 cookies, I will gain 6 if I stay on this side from now 'till the end
-    House 7 with 1 cookies, I will gain 1 if I stay on this side from now 'till the end
-                                    House 6 with 2 cookies, I will gain 8 if I stay on this side from now 'till the end
-    House 5 with 4 cookies, I will gain 5 if I stay on this side from now 'till the end
-                                    House 4 with 2 cookies, I will gain 10 if I stay on this side from now 'till the end
-    House 3 with 7 cookies, I will gain 12 if I stay on this side from now 'till the end
-                                    House 2 with 6 cookies, I will gain 16 if I stay on this side from now 'till the end
-    House 1 with 6 cookies, I will gain 18 if I stay on this side from now 'till the end
+                                   House 8 with 6 cookies, I will gain 6 if I stay on this side from now 'till the end
+House 7 with 2 cookies, I will gain 2 if I stay on this side from now 'till the end
+                                   House 6 with 1 cookies, I will gain 7 if I stay on this side from now 'till the end
+House 5 with 0 cookies, I will gain 2 if I stay on this side from now 'till the end
+                                   House 4 with 2 cookies, I will gain 9 if I stay on this side from now 'till the end
+House 3 with 8 cookies, I will gain 10 if I stay on this side from now 'till the end
+                                   House 2 with 4 cookies, I will gain 13 if I stay on this side from now 'till the end
+House 1 with 2 cookies, I will gain 12 if I stay on this side from now 'till the end
 
-    **************
-    Prajituri primite: 22
-    Case vizitate: 1 2 4 6 8 
+**************
+Comparing f(4,2) = 11 and  f(3,1) = 17
+Comparing f(5,1) = 8 and  f(4,0) = 9
+Comparing f(6,0) = 7 and  f(5,-1) = 0
+Comparing f(8,0) = 6 and  f(7,-1) = 0
+Comparing f(10,0) = 0 and  f(9,-1) = 0
+Domeniile si codomeniul functiei f
+ [f(1,0) = 0]  [f(2,0) = 0]  [f(3,0) = 10]  [f(4,0) = 9]  [f(5,0) = 2]  [f(6,0) = 7]  [f(7,0) = 2]  [f(8,0) = 6]
+ [f(1,1) = 0]  [f(2,1) = 14]  [f(3,1) = 17]  [f(4,1) = 9]  [f(5,1) = 8]  [f(6,1) = 7]  [f(7,1) = 8]  [f(8,1) = 6]
+ [f(1,2) = 19]  [f(2,2) = 21]  [f(3,2) = 17]  [f(4,2) = 11]  [f(5,2) = 8]  [f(6,2) = 9]  [f(7,2) = 8]  [f(8,2) = 6]
 
-    Scriere date in fisierul data.out...success!!
-------------------------------------------------------------------------------
+Prajituri primite: 21
+Case vizitate: 2 3 4 6 8
 */
