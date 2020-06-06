@@ -115,7 +115,7 @@ class GarfieldProblem {
     public void rezolva() {
 
 
-       // Integer[] computedCookies = new Integer[this.cookies_per_house.length];//computeRemainingCookies(this.cookies_per_house);
+
         computed_remaining_cookies = computeRemainingCookies(cookies_per_house);
         case_si_treceri = new int[T+1][cookies_per_house.length];
         for(int i = 0;i< case_si_treceri.length;i++)
@@ -123,10 +123,6 @@ class GarfieldProblem {
                 case_si_treceri[i][j] = 0;
 
 
-    /*    for(int i = 1; i<computedCookies.length;i++){
-            computedCookies[i]= -1;
-        }
-        computeCookies(computedCookies,1);*/
 
         System.out.println("\n**************");
 
@@ -190,10 +186,6 @@ class GarfieldProblem {
         return  remCookies;
     }
 
-    public void computeRemainingCookiesV2(int[] houses,Integer[] result,int house){
-
-
-    }
 
     public int f(int x,int T) {
        // System.out.print("computing f("+(x)+","+T+") = ");
