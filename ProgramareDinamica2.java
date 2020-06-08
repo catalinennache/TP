@@ -138,6 +138,7 @@ class GarfieldProblem {
 
         visited_houses  = new ArrayList<>();
 
+        // De aici 
 
         for(int i = start_house; i<cookies_per_house.length;i=i+2){
             cookies_in_the_bag += cookies_per_house[i];
@@ -152,6 +153,10 @@ class GarfieldProblem {
                 T--; //contorizam de cate ori a trecut strada
             }
         }
+
+        //Pana aici avem (n*n) (for-ul care executa de n ori functia f de complexitate n)
+        //Functia f are complexitate O(n) pentru ca in bucla recursiva argumentele ei se modifica printr-o operatie de gradul 1
+        //iar costul unei executii este O(1)
 
         System.out.println("Domeniile si codomeniul functiei f");
 
@@ -171,7 +176,7 @@ class GarfieldProblem {
         });
         System.out.println("\n");
 
-
+        //Complexitatea problemei este O(n^2)
     }
 
     //pentru fiecare pozitie posibila calculeaza cate prajituri va obtine daca din acel moment va merge numai pe acea parte pana la final
