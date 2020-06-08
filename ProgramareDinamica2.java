@@ -154,7 +154,7 @@ class GarfieldProblem {
             }
         }
 
-        //Pana aici avem (n*n) (for-ul care executa de n ori functia f de complexitate n)
+        //Pana aici avem O(n*n) (for-ul care executa de n ori functia f de complexitate n)
         //Functia f are complexitate O(n) pentru ca in bucla recursiva argumentele ei se modifica printr-o operatie de gradul 1
         //iar costul unei executii este O(1)
 
